@@ -1,9 +1,9 @@
 streamlit
-mysql-connector-python
 matplotlib
 pillow
 numpy
 google.generativeai
+
 
 
 
