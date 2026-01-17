@@ -3,4 +3,5 @@ mysql-connector-python
 matplotlib
 pillow
 numpy
+ai_model
 
