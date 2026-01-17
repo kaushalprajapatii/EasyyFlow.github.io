@@ -13,6 +13,9 @@ import time
 import base64
 # in new1.py or any layout file if transparency.py is alongside new1.py
 from transparency import apply_alpha_to_color
+import streamlit as st
+st.write(list(st.secrets.keys()))
+
 
 
 from login import login
