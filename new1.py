@@ -17,46 +17,46 @@ from transparency import apply_alpha_to_color
 
 
 
-# from login import login
-# from signup import signup
+from login import login
+from signup import signup
 
-# st.set_page_config(page_title="User Authentication", layout="centered")
+st.set_page_config(page_title="User Authentication", layout="centered")
 
-# if "user" not in st.session_state:
-#     st.session_state["user"] = None
-# if "page" not in st.session_state:
-#     st.session_state["page"] = "Login"
+if "user" not in st.session_state:
+    st.session_state["user"] = None
+if "page" not in st.session_state:
+    st.session_state["page"] = "Login"
 
-# def main():
-#     if st.session_state["user"] is None:
-#         if st.session_state["page"] == "Login":
-#             login()
-#         else:
-#             signup()
+def main():
+    if st.session_state["user"] is None:
+        if st.session_state["page"] == "Login":
+            login()
+        else:
+            signup()
 
-#         col1, col2 = st.columns(2)
-#         with col1:
-#             if st.button("Go to Login"):
-#                 st.session_state["page"] = "Login"
-#                 st.rerun()
-#         with col2:
-#             if st.button("Go to Signup"):
-#                 st.session_state["page"] = "Signup"
-#                 st.rerun()
-#         st.stop()
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Go to Login"):
+                st.session_state["page"] = "Login"
+                st.rerun()
+        with col2:
+            if st.button("Go to Signup"):
+                st.session_state["page"] = "Signup"
+                st.rerun()
+        st.stop()
 
-#     show_homepage()
+    show_homepage()
 
-# def show_homepage():
-#     st.title(f"Welcome, {st.session_state['user']} 🎉")
-#     st.write("✅ You are now logged in. Your website content goes here.")
-#     if st.button("Logout"):
-#         st.session_state["user"] = None
-#         st.session_state["page"] = "Login"
-#         st.rerun() 
+def show_homepage():
+    st.title(f"Welcome, {st.session_state['user']} 🎉")
+    st.write("✅ You are now logged in. Your website content goes here.")
+    if st.button("Logout"):
+        st.session_state["user"] = None
+        st.session_state["page"] = "Login"
+        st.rerun() 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
 
 
 # Set matplotlib to use a basic style and disable style-related issues
