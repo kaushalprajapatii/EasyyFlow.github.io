@@ -4,4 +4,5 @@ matplotlib
 pillow
 numpy
 ai_model
+google.generativeai
 
