@@ -78,7 +78,7 @@ importlib.reload(ai_model)
 
 # --- FONT CONFIGURATION ---
 # Define the path to your .otf font file using a raw string
-FONT_PATH = None
+FONT_PATH = r"helvetica-255/helvetica-rounded-bold-5871d05ead8de.otf"
 
 # --- FUNCTION TO LOAD EXTERNAL CSS ---
 def load_css(file_name):
