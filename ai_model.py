@@ -91,7 +91,7 @@ def generate_flowchart_steps(topic: str, num_steps: int) -> str:
     """
 
     # Create Gemini model instance
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel("gemini-3-flash-preview")
 
     prompt = f"""
 You are an expert at creating clear and concise process flowcharts.
