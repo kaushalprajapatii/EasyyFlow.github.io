@@ -92,7 +92,7 @@ import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 # Configure Gemini API
 api_key = os.getenv("GOOGLE_API_KEY")
