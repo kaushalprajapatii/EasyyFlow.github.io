@@ -85,97 +85,35 @@
 # #         return f"Error : Could not generate content from AI model. Details: {e}"
 
 
-# # ai_model.py
-# import os
-# # from dotenv import load_dotenv
-# import google.generativeai as genai
-# from google.generativeai.types import HarmCategory, HarmBlockThreshold
-
-# # Load environment variables
-# # load_dotenv()
-
-# # Configure Gemini API
-# api_key = os.getenv("GOOGLE_API_KEY")
-# if not api_key:
-#     raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
-
-# genai.configure(api_key=api_key)
-
-# # Create model ONCE (best practice)
-# model = genai.GenerativeModel(
-#     "gemini-3-flash-preview",
-#     safety_settings={
-#         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-#         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-#         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-#     },
-# )
-
-# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
-#     """
-#     Generates flowchart steps using Gemini.
-
-#     Returns:
-#         str: Flowchart steps OR error message
-#     """
-
-#     prompt = f"""
-# You are an expert at creating clear and concise process flowcharts.
-
-# Generate exactly {num_steps} steps for the topic "{topic}".
-
-# Rules:
-# - Exactly {num_steps} lines
-# - Format strictly: Title : Description
-# - No numbering
-# - No markdown
-# - No extra text
-
-# Example:
-# Boil Water : Heat water in a kettle until boiling.
-# Steep Tea : Pour hot water over the tea bag.
-# Infuse : Let the tea rest for 3 to 5 minutes.
-# Serve : Remove tea bag and serve hot.
-# """
-
-#     try:
-#         response = model.generate_content(prompt)
-
-#         output_text = ""
-
-#         if response.candidates:
-#             candidate = response.candidates[0]
-
-#             if candidate.content and candidate.content.parts:
-#                 for part in candidate.content.parts:
-#                     if hasattr(part, "text") and part.text:
-#                         output_text += part.text
-
-#         if not output_text.strip():
-#             return "Error: Gemini returned no text for this prompt."
-
-#         return output_text.strip()
-
-#     except Exception as e:
-#         return f"Error : Could not generate content from AI model. Details: {e}"
-
-
 # ai_model.py
 import os
-from openai import OpenAI
+# from dotenv import load_dotenv
+import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
-# Load API key
-api_key = os.getenv("OPENAI_API_KEY")
+# Load environment variables
+# load_dotenv()
+
+# Configure Gemini API
+api_key = os.getenv("GOOGLE_API_KEY")
 if not api_key:
-    raise ValueError("OpenAI API Key not found. Set OPENAI_API_KEY in environment variables.")
+    raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
 
-# Create OpenAI client ONCE (best practice)
-client = OpenAI(api_key=api_key)
+genai.configure(api_key=api_key)
 
+# Create model ONCE (best practice)
+model = genai.GenerativeModel(
+    "gemini-3-flash-preview",
+    safety_settings={
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    },
+)
 
 def generate_flowchart_steps(topic: str, num_steps: int) -> str:
     """
-    Generates flowchart steps using OpenAI.
+    Generates flowchart steps using Gemini.
 
     Returns:
         str: Flowchart steps OR error message
@@ -201,21 +139,83 @@ Serve : Remove tea bag and serve hot.
 """
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",   # cheap + stable
-            messages=[
-                {"role": "system", "content": "You generate structured flowchart steps."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4,
-        )
+        response = model.generate_content(prompt)
 
-        output_text = response.choices[0].message.content.strip()
+        output_text = ""
 
-        if not output_text:
-            return "Error: OpenAI returned no text for this prompt."
+        if response.candidates:
+            candidate = response.candidates[0]
 
-        return output_text
+            if candidate.content and candidate.content.parts:
+                for part in candidate.content.parts:
+                    if hasattr(part, "text") and part.text:
+                        output_text += part.text
+
+        if not output_text.strip():
+            return "Error: Gemini returned no text for this prompt."
+
+        return output_text.strip()
 
     except Exception as e:
         return f"Error : Could not generate content from AI model. Details: {e}"
+
+
+# # ai_model.py
+# import os
+# from openai import OpenAI
+
+# # Load API key
+# api_key = os.getenv("OPENAI_API_KEY")
+# if not api_key:
+#     raise ValueError("OpenAI API Key not found. Set OPENAI_API_KEY in environment variables.")
+
+# # Create OpenAI client ONCE (best practice)
+# client = OpenAI(api_key=api_key)
+
+
+# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+#     """
+#     Generates flowchart steps using OpenAI.
+
+#     Returns:
+#         str: Flowchart steps OR error message
+#     """
+
+#     prompt = f"""
+# You are an expert at creating clear and concise process flowcharts.
+
+# Generate exactly {num_steps} steps for the topic "{topic}".
+
+# Rules:
+# - Exactly {num_steps} lines
+# - Format strictly: Title : Description
+# - No numbering
+# - No markdown
+# - No extra text
+
+# Example:
+# Boil Water : Heat water in a kettle until boiling.
+# Steep Tea : Pour hot water over the tea bag.
+# Infuse : Let the tea rest for 3 to 5 minutes.
+# Serve : Remove tea bag and serve hot.
+# """
+
+#     try:
+#         response = client.chat.completions.create(
+#             model="gpt-4o-mini",   # cheap + stable
+#             messages=[
+#                 {"role": "system", "content": "You generate structured flowchart steps."},
+#                 {"role": "user", "content": prompt}
+#             ],
+#             temperature=0.4,
+#         )
+
+#         output_text = response.choices[0].message.content.strip()
+
+#         if not output_text:
+#             return "Error: OpenAI returned no text for this prompt."
+
+#         return output_text
+
+#     except Exception as e:
+#         return f"Error : Could not generate content from AI model. Details: {e}"
