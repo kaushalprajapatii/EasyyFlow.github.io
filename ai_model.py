@@ -112,9 +112,17 @@ Serve : Remove the tea bag and serve.
 Now generate the steps for: "{topic}"
 """
 
-    try:
-        response = model.generate_content(prompt)
-        return response.text.strip()
+try:
+response = model.generate_content(prompt)
 
-    except Exception as e:
-        return f"Error : Could not generate content from AI model. Details: {e}"
+if response.candidates:
+    content = response.candidates[0].content.parts
+    if content:
+        st.write(content[0].text)
+    else:
+        st.warning("No text returned by the model.")
+else:
+    st.warning("Model did not return any candidates.")
+    
+except Exception as e:
+    return f"Error : Could not generate content from AI model. Details: {e}"
