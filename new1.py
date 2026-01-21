@@ -88,7 +88,7 @@ def load_css(file_name):
             css_content = f.read()
             
             # Convert image to base64 and embed in CSS
-            bg_image_path = r"D:\Projects\PROJECT 00 - FLOW CHART GENERATOR\easyflow_00\bg.png"
+            bg_image_path = r"bg.png"
             try:
                 with open(bg_image_path, "rb") as img_file:
                     bg_base64 = base64.b64encode(img_file.read()).decode()
