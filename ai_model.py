@@ -87,7 +87,7 @@
 
 # ai_model.py
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
