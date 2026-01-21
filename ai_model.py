@@ -97,88 +97,38 @@
 
 
 
-# # ai_model.py
-# import os
-# # from dotenv import load_dotenv
-# import google.generativeai as genai
-# from google.generativeai.types import HarmCategory, HarmBlockThreshold
-
-# # Load environment variables
-# # load_dotenv()
-
-# # Configure Gemini API
-# api_key = os.getenv("GOOGLE_API_KEY")
-# if not api_key:
-#     raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
-
-# genai.configure(api_key=api_key)
-
-# # Create model ONCE (best practice)
-# model = genai.GenerativeModel(
-#     "gemini-3-flash-preview",
-#     safety_settings={
-#         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-#         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-#         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-#     },
-# )
-
-# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
-#     """
-#     Generates flowchart steps using Gemini.
-
-#     Returns:
-#         str: Flowchart steps OR error message
-#     """
-
-#     prompt = f"""
-# You are an expert at creating clear and concise process flowcharts.
-
-# Generate exactly {num_steps} steps for the topic "{topic}".
-
-# Rules:
-# - Exactly {num_steps} lines
-# - Format strictly: Title : Description
-# - No numbering
-# - No markdown
-# - No extra text
-
-# Example:
-# Boil Water : Heat water in a kettle until boiling.
-# Steep Tea : Pour hot water over the tea bag.
-# Infuse : Let the tea rest for 3 to 5 minutes.
-# Serve : Remove tea bag and serve hot.
-# """
-
-#     try:
-#         response = model.generate_content(prompt)
-
-#         output_text = ""
-
-#         if response.candidates:
-#             candidate = response.candidates[0]
-
-#             if candidate.content and candidate.content.parts:
-#                 for part in candidate.content.parts:
-#                     if hasattr(part, "text") and part.text:
-#                         output_text += part.text
-
-#         if not output_text.strip():
-#             return "Error: Gemini returned no text for this prompt."
-
-#         return output_text.strip()
-
-#     except Exception as e:
-#         return f"Error : Could not generate content from AI model. Details: {e}"
-
-
 # ai_model.py
-import requests
+import os
+# from dotenv import load_dotenv
+import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
+# Load environment variables
+# load_dotenv()
+
+# Configure Gemini API
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
+
+genai.configure(api_key=api_key)
+
+# Create model ONCE (best practice)
+model = genai.GenerativeModel(
+    "gemini-3-flash-preview",
+    safety_settings={
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    },
+)
 
 def generate_flowchart_steps(topic: str, num_steps: int) -> str:
     """
-    Generates flowchart steps using local Mistral model via Ollama.
+    Generates flowchart steps using Gemini.
+
+    Returns:
+        str: Flowchart steps OR error message
     """
 
     prompt = f"""
@@ -201,25 +151,75 @@ Serve : Remove tea bag and serve hot.
 """
 
     try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "mistral",
-                "prompt": prompt,
-                "stream": False
-            },
-            timeout=60
-        )
+        response = model.generate_content(prompt)
 
-        data = response.json()
-        output = data.get("response", "").strip()
+        output_text = ""
 
-        if not output:
-            return "Error: Model returned empty response."
+        if response.candidates:
+            candidate = response.candidates[0]
 
-        return output
+            if candidate.content and candidate.content.parts:
+                for part in candidate.content.parts:
+                    if hasattr(part, "text") and part.text:
+                        output_text += part.text
+
+        if not output_text.strip():
+            return "Error: Gemini returned no text for this prompt."
+
+        return output_text.strip()
 
     except Exception as e:
-        return f"Error: Could not generate content. Details: {e}"
+        return f"Error : Could not generate content from AI model. Details: {e}"
+
+
+# # ai_model.py
+# import requests
+
+
+# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+#     """
+#     Generates flowchart steps using local Mistral model via Ollama.
+#     """
+
+#     prompt = f"""
+# You are an expert at creating clear and concise process flowcharts.
+
+# Generate exactly {num_steps} steps for the topic "{topic}".
+
+# Rules:
+# - Exactly {num_steps} lines
+# - Format strictly: Title : Description
+# - No numbering
+# - No markdown
+# - No extra text
+
+# Example:
+# Boil Water : Heat water in a kettle until boiling.
+# Steep Tea : Pour hot water over the tea bag.
+# Infuse : Let the tea rest for 3 to 5 minutes.
+# Serve : Remove tea bag and serve hot.
+# """
+
+#     try:
+#         response = requests.post(
+#             "http://localhost:11434/api/generate",
+#             json={
+#                 "model": "mistral",
+#                 "prompt": prompt,
+#                 "stream": False
+#             },
+#             timeout=60
+#         )
+
+#         data = response.json()
+#         output = data.get("response", "").strip()
+
+#         if not output:
+#             return "Error: Model returned empty response."
+
+#         return output
+
+#     except Exception as e:
+#         return f"Error: Could not generate content. Details: {e}"
 
 
