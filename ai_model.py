@@ -13,7 +13,7 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+def generate_flowchart_steps(topic : str, num_steps : int) -> str:
     print("✅ Using Mistral via Hugging Face (OpenAI-compatible API)")
 
     prompt = f"""
@@ -25,6 +25,12 @@ Rules:
 - No numbering
 - No markdown
 - No extra text
+
+Example:
+Boil Water : Heat water in a kettle until boiling.
+Steep Tea : Pour hot water over the tea bag.
+Infuse : Let the tea rest for 3 to 5 minutes.
+Serve : Remove tea bag and serve hot.
 """
 
     payload = {
