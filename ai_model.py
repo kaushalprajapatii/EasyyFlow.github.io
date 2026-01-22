@@ -1,3 +1,71 @@
+# ai_model.py
+import os
+import requests
+
+HF_API_KEY = os.getenv("HF_API_KEY")
+if not HF_API_KEY:
+    raise ValueError("HF_API_KEY not found in Streamlit secrets.")
+
+API_URL = "https://router.huggingface.co/v1/chat/completions"
+
+HEADERS = {
+    "Authorization": f"Bearer {HF_API_KEY}",
+    "Content-Type": "application/json"
+}
+
+def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+    print("✅ Using Mistral via Hugging Face (OpenAI-compatible API)")
+
+    prompt = f"""
+Generate exactly {num_steps} steps for the topic "{topic}".
+
+Rules:
+- Exactly {num_steps} lines
+- Format strictly: Title : Description
+- No numbering
+- No markdown
+- No extra text
+"""
+
+    payload = {
+        "model": "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai",
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.6,
+        "max_tokens": 300
+    }
+
+    try:
+        response = requests.post(
+            API_URL,
+            headers=HEADERS,
+            json=payload,
+            timeout=60
+        )
+
+        if response.status_code != 200:
+            return f"Error: HF API failed ({response.status_code}) - {response.text}"
+
+        data = response.json()
+        return data["choices"][0]["message"]["content"].strip()
+
+    except Exception as e:
+        return f"Error: {e}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # # # ai_model.py
 # # import os
 # # import google.generativeai as genai
@@ -249,71 +317,71 @@
 #         return f"Error : Could not generate content from AI model. Details: {e}"
 
 
-# ai_model.py
-import os
-import requests
+# # ai_model.py
+# import os
+# import requests
 
-# Load Hugging Face API Key
-HF_API_KEY = os.getenv("HF_API_KEY")
-if not HF_API_KEY:
-    raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
+# # Load Hugging Face API Key
+# HF_API_KEY = os.getenv("HF_API_KEY")
+# if not HF_API_KEY:
+#     raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
 
-# ✅ Correct Mistral endpoint (REST compatible)
-API_URL = "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"
+# # ✅ Correct Mistral endpoint (REST compatible)
+# API_URL = "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"
 
 
-HEADERS = {
-    "Authorization": f"Bearer {HF_API_KEY}",
-    "Content-Type": "application/json"
-}
+# HEADERS = {
+#     "Authorization": f"Bearer {HF_API_KEY}",
+#     "Content-Type": "application/json"
+# }
 
-def generate_flowchart_steps(topic: str, num_steps: int) -> str:
-    """
-    Generates flowchart steps using Mistral (Hugging Face).
-    Returns:
-        str: Flowchart steps OR error message
-    """
+# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+#     """
+#     Generates flowchart steps using Mistral (Hugging Face).
+#     Returns:
+#         str: Flowchart steps OR error message
+#     """
 
-    print("✅ Using Mistral via Hugging Face")
+#     print("✅ Using Mistral via Hugging Face")
 
-    prompt = f"""
-You are an expert at creating clear and concise process flowcharts.
+#     prompt = f"""
+# You are an expert at creating clear and concise process flowcharts.
 
-Generate exactly {num_steps} steps for the topic "{topic}".
+# Generate exactly {num_steps} steps for the topic "{topic}".
 
-Rules:
-- Exactly {num_steps} lines
-- Format strictly: Title : Description
-- No numbering
-- No markdown
-- No extra text
-"""
+# Rules:
+# - Exactly {num_steps} lines
+# - Format strictly: Title : Description
+# - No numbering
+# - No markdown
+# - No extra text
+# """
 
-    payload = {
-        "inputs": f"<s>[INST] {prompt} [/INST]",
-        "parameters": {
-            "max_new_tokens": 300,
-            "temperature": 0.6,
-            "top_p": 0.9,
-            "do_sample": True
-        }
-    }
+#     payload = {
+#         "inputs": f"<s>[INST] {prompt} [/INST]",
+#         "parameters": {
+#             "max_new_tokens": 300,
+#             "temperature": 0.6,
+#             "top_p": 0.9,
+#             "do_sample": True
+#         }
+#     }
 
-    try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=60)
+#     try:
+#         response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=60)
 
-        if response.status_code != 200:
-            return f"Error: HF API failed ({response.status_code}) - {response.text}"
+#         if response.status_code != 200:
+#             return f"Error: HF API failed ({response.status_code}) - {response.text}"
 
-        result = response.json()
+#         result = response.json()
 
-        if not isinstance(result, list) or "generated_text" not in result[0]:
-            return "Error: Mistral returned empty or invalid output."
+#         if not isinstance(result, list) or "generated_text" not in result[0]:
+#             return "Error: Mistral returned empty or invalid output."
 
-        return result[0]["generated_text"].strip()
+#         return result[0]["generated_text"].strip()
 
-    except Exception as e:
-        return f"Error: Could not generate content from AI model. Details: {e}"
+#     except Exception as e:
+#         return f"Error: Could not generate content from AI model. Details: {e}"
 
 
 
