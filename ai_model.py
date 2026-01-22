@@ -177,6 +177,78 @@
 
 
 
+# # ai_model.py
+# import os
+# import requests
+
+# # Load Hugging Face API Key
+# HF_API_KEY = os.getenv("HF_API_KEY")
+# if not HF_API_KEY:
+#     raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
+
+# # Mistral model endpoint
+# # API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+# API_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
+
+
+# HEADERS = {
+#     "Authorization": f"Bearer {HF_API_KEY}",
+#     "Content-Type": "application/json"
+# }
+
+# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+#     """
+#     Generates flowchart steps using Mistral (Hugging Face).
+#     Returns:
+#         str: Flowchart steps OR error message
+#     """
+
+#     prompt = f"""
+# You are an expert at creating clear and concise process flowcharts.
+
+# Generate exactly {num_steps} steps for the topic "{topic}".
+
+# Rules:
+# - Exactly {num_steps} lines
+# - Format strictly: Title : Description
+# - No numbering
+# - No markdown
+# - No extra text
+
+# Example:
+# Boil Water : Heat water in a kettle until boiling.
+# Steep Tea : Pour hot water over the tea bag.
+# Infuse : Let the tea rest for 3 to 5 minutes.
+# Serve : Remove tea bag and serve hot.
+# """
+
+#     payload = {
+#         "inputs": f"<s>[INST] {prompt} [/INST]",
+#         "parameters": {
+#             "max_new_tokens": 300,
+#             "temperature": 0.6,
+#             "top_p": 0.9,
+#             "do_sample": True
+#         }
+#     }
+
+#     try:
+#         response = requests.post(API_URL, headers=HEADERS, json=payload)
+
+#         if response.status_code != 200:
+#             return f"Error: HF API failed ({response.status_code}) - {response.text}"
+
+#         result = response.json()
+
+#         if not result or "generated_text" not in result[0]:
+#             return "Error: Mistral returned empty output."
+
+#         return result[0]["generated_text"].strip()
+
+#     except Exception as e:
+#         return f"Error : Could not generate content from AI model. Details: {e}"
+
+
 # ai_model.py
 import os
 import requests
@@ -186,10 +258,8 @@ HF_API_KEY = os.getenv("HF_API_KEY")
 if not HF_API_KEY:
     raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
 
-# Mistral model endpoint
-# API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-API_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
-
+# ✅ Correct Mistral endpoint (REST compatible)
+API_URL = "https://router.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 
 HEADERS = {
     "Authorization": f"Bearer {HF_API_KEY}",
@@ -203,6 +273,8 @@ def generate_flowchart_steps(topic: str, num_steps: int) -> str:
         str: Flowchart steps OR error message
     """
 
+    print("✅ Using Mistral via Hugging Face")
+
     prompt = f"""
 You are an expert at creating clear and concise process flowcharts.
 
@@ -214,12 +286,6 @@ Rules:
 - No numbering
 - No markdown
 - No extra text
-
-Example:
-Boil Water : Heat water in a kettle until boiling.
-Steep Tea : Pour hot water over the tea bag.
-Infuse : Let the tea rest for 3 to 5 minutes.
-Serve : Remove tea bag and serve hot.
 """
 
     payload = {
@@ -233,20 +299,21 @@ Serve : Remove tea bag and serve hot.
     }
 
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=60)
 
         if response.status_code != 200:
             return f"Error: HF API failed ({response.status_code}) - {response.text}"
 
         result = response.json()
 
-        if not result or "generated_text" not in result[0]:
-            return "Error: Mistral returned empty output."
+        if not isinstance(result, list) or "generated_text" not in result[0]:
+            return "Error: Mistral returned empty or invalid output."
 
         return result[0]["generated_text"].strip()
 
     except Exception as e:
-        return f"Error : Could not generate content from AI model. Details: {e}"
+        return f"Error: Could not generate content from AI model. Details: {e}"
+
 
 
 
