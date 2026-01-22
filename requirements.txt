@@ -5,7 +5,8 @@ numpy
 google.generativeai
 python-dotenv
 requests
-sys
+
+
 
 
 
