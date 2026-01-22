@@ -97,36 +97,106 @@
 
 
 
+# # ai_model.py
+# import os
+# # from dotenv import load_dotenv
+# import google.generativeai as genai
+# from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+# # Load environment variables
+# # load_dotenv()
+
+# # Configure Gemini API
+# api_key = os.getenv("GOOGLE_API_KEY")
+# if not api_key:
+#     raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
+
+# genai.configure(api_key=api_key)
+
+# # Create model ONCE (best practice)
+# model = genai.GenerativeModel(
+#     "gemini-3-flash-preview",
+#     safety_settings={
+#         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+#         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+#         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+#     },
+# )
+
+# def generate_flowchart_steps(topic: str, num_steps: int) -> str:
+#     """
+#     Generates flowchart steps using Gemini.
+
+#     Returns:
+#         str: Flowchart steps OR error message
+#     """
+
+#     prompt = f"""
+# You are an expert at creating clear and concise process flowcharts.
+
+# Generate exactly {num_steps} steps for the topic "{topic}".
+
+# Rules:
+# - Exactly {num_steps} lines
+# - Format strictly: Title : Description
+# - No numbering
+# - No markdown
+# - No extra text
+
+# Example:
+# Boil Water : Heat water in a kettle until boiling.
+# Steep Tea : Pour hot water over the tea bag.
+# Infuse : Let the tea rest for 3 to 5 minutes.
+# Serve : Remove tea bag and serve hot.
+# """
+
+#     try:
+#         response = model.generate_content(prompt)
+
+#         output_text = ""
+
+#         if response.candidates:
+#             candidate = response.candidates[0]
+
+#             if candidate.content and candidate.content.parts:
+#                 for part in candidate.content.parts:
+#                     if hasattr(part, "text") and part.text:
+#                         output_text += part.text
+
+#         if not output_text.strip():
+#             return "Error: Gemini returned no text for this prompt."
+
+#         return output_text.strip()
+
+#     except Exception as e:
+#         return f"Error : Could not generate content from AI model. Details: {e}"
+
+
+
+
+
+
+
 # ai_model.py
 import os
-# from dotenv import load_dotenv
-import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+import requests
 
-# Load environment variables
-# load_dotenv()
+# Load Hugging Face API Key
+HF_API_KEY = os.getenv("HF_API_KEY")
+if not HF_API_KEY:
+    raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
 
-# Configure Gemini API
-api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise ValueError("Google API Key not found. Set GOOGLE_API_KEY in environment variables.")
+# Mistral model endpoint
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 
-genai.configure(api_key=api_key)
-
-# Create model ONCE (best practice)
-model = genai.GenerativeModel(
-    "gemini-3-flash-preview",
-    safety_settings={
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    },
-)
+HEADERS = {
+    "Authorization": f"Bearer {HF_API_KEY}",
+    "Content-Type": "application/json"
+}
 
 def generate_flowchart_steps(topic: str, num_steps: int) -> str:
     """
-    Generates flowchart steps using Gemini.
-
+    Generates flowchart steps using Mistral (Hugging Face).
     Returns:
         str: Flowchart steps OR error message
     """
@@ -150,26 +220,37 @@ Infuse : Let the tea rest for 3 to 5 minutes.
 Serve : Remove tea bag and serve hot.
 """
 
+    payload = {
+        "inputs": f"<s>[INST] {prompt} [/INST]",
+        "parameters": {
+            "max_new_tokens": 300,
+            "temperature": 0.6,
+            "top_p": 0.9,
+            "do_sample": True
+        }
+    }
+
     try:
-        response = model.generate_content(prompt)
+        response = requests.post(API_URL, headers=HEADERS, json=payload)
 
-        output_text = ""
+        if response.status_code != 200:
+            return f"Error: HF API failed ({response.status_code}) - {response.text}"
 
-        if response.candidates:
-            candidate = response.candidates[0]
+        result = response.json()
 
-            if candidate.content and candidate.content.parts:
-                for part in candidate.content.parts:
-                    if hasattr(part, "text") and part.text:
-                        output_text += part.text
+        if not result or "generated_text" not in result[0]:
+            return "Error: Mistral returned empty output."
 
-        if not output_text.strip():
-            return "Error: Gemini returned no text for this prompt."
-
-        return output_text.strip()
+        return result[0]["generated_text"].strip()
 
     except Exception as e:
         return f"Error : Could not generate content from AI model. Details: {e}"
+
+
+
+
+
+
 
 
 # # ai_model.py
