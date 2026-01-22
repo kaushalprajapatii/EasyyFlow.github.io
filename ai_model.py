@@ -13,10 +13,11 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-def generate_flowchart_steps(topic : str, num_steps : int) -> str:
+def generate_flowchart_steps(topic: str, num_steps: int) -> str:
     print("✅ Using Mistral via Hugging Face (OpenAI-compatible API)")
 
     prompt = f"""
+    You are an expert at creating clear and concise process flowcharts.
 Generate exactly {num_steps} steps for the topic "{topic}".
 
 Rules:
