@@ -259,7 +259,8 @@ if not HF_API_KEY:
     raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
 
 # ✅ Correct Mistral endpoint (REST compatible)
-API_URL = "https://router.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+API_URL = "https://router.huggingface.co/v1/chat/completions"
+
 
 HEADERS = {
     "Authorization": f"Bearer {HF_API_KEY}",
