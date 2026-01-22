@@ -187,7 +187,9 @@ if not HF_API_KEY:
     raise ValueError("HF_API_KEY not found. Set it in environment variables or Streamlit secrets.")
 
 # Mistral model endpoint
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+# API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+API_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
+
 
 HEADERS = {
     "Authorization": f"Bearer {HF_API_KEY}",
